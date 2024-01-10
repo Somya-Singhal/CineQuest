@@ -3,6 +3,7 @@ import { HiOutlineSearch } from "react-icons/hi";
 import { SlMenu } from "react-icons/sl";
 import { VscChromeClose } from "react-icons/vsc";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import "./style.scss";
 
@@ -17,6 +18,7 @@ const Header = () => {
     const [showSearch, setShowSearch] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
+    const { loginWithRedirect, isAuthenticated, logout, user } = useAuth0();
 
     useEffect(()=> {
       window.scrollTo(0,0);
@@ -73,11 +75,23 @@ const Header = () => {
               <img src={logo} alt="" />
             </div>
             <ul className="menuItems">
+            {isAuthenticated ? (
+              <li className="menuItem" onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>Log Out</li>
+            ) : (
+              <li className="menuItem" onClick={() => loginWithRedirect()}>Log In</li>
+            )}
               <li className="menuItem" onClick={()=>navigationHandler("movie")}>Movies</li>
               <li className="menuItem" onClick={()=>navigationHandler("tv")}>TV Shows</li>
               <li className="menuItem">
                 <HiOutlineSearch onClick={openSearch} />
               </li>
+              {isAuthenticated && (
+                <li className="menuItem">
+                  <div>
+                    <img src={user.picture} alt={user.nickname} className="loginImg"/>
+                  </div>
+                </li>
+              )}
             </ul>
             <div className="mobileMenuItems">
               <HiOutlineSearch onClick={openSearch} />
